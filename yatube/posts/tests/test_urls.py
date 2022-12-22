@@ -2,6 +2,7 @@ from django.test import TestCase, Client
 from posts.models import Post, Group, User
 from http import HTTPStatus
 from django.urls import reverse
+from django.core.cache import cache
 
 
 class PostURLTests(TestCase):
@@ -53,18 +54,26 @@ class PostURLTests(TestCase):
 
     def test_urls_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
+        cache.clear()
         templates_url_names = {
-            reverse('posts:index'): 'posts/index.html',
-            reverse('posts:group_list', kwargs={'slug': 'test-slug'}):
-            'posts/group_list.html',
-            reverse('posts:profile', args={self.user}):
-            'posts/profile.html',
-            reverse('posts:post_detail', args={self.post.id}):
-            'posts/post_detail.html',
+            'posts/index.html': reverse(
+                'posts:posts'),
+            'posts/group_list.html': reverse(
+                'posts:group_list',
+                kwargs={'slug': self.group.slug}
+            ),
+            'posts/profile.html': reverse(
+                'posts:profile',
+                kwargs={'username': self.user}
+            ),
+            'posts/post_detail.html': reverse(
+                'posts:post_detail',
+                kwargs={'post_id': self.post.id}
+            )
         }
-        for adress, template in templates_url_names.items():
+        for template, adress in templates_url_names.items():
             with self.subTest(adress=adress):
-                response = self.guest_client.get(adress)
+                response = self.client.get(adress)
                 self.assertTemplateUsed(response, template)
 
     def test_wrong_uri_returns_404(self):
