@@ -56,22 +56,14 @@ class PostURLTests(TestCase):
         """URL-адрес использует соответствующий шаблон."""
         cache.clear()
         templates_url_names = {
-            'posts/index.html': reverse(
-                'posts:posts'),
-            'posts/group_list.html': reverse(
-                'posts:group_list',
-                kwargs={'slug': self.group.slug}
-            ),
-            'posts/profile.html': reverse(
-                'posts:profile',
-                kwargs={'username': self.user}
-            ),
-            'posts/post_detail.html': reverse(
-                'posts:post_detail',
-                kwargs={'post_id': self.post.id}
-            )
+            '/': 'posts/index.html',
+            f'/group/{self.group.slug}/': 'posts/group_list.html',
+            f'/profile/{self.user.username}/': 'posts/profile.html',
+            f'/posts/{self.post.pk}/': 'posts/post_detail.html',
+            '/about/author/': 'about/author.html',
+            '/about/tech/': 'about/tech.html',
         }
-        for template, adress in templates_url_names.items():
+        for adress, template in templates_url_names.items():
             with self.subTest(adress=adress):
                 response = self.client.get(adress)
                 self.assertTemplateUsed(response, template)
