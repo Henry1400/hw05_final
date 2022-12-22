@@ -1,7 +1,6 @@
 from django.test import TestCase, Client
 from posts.models import Post, Group, User
 from http import HTTPStatus
-from django.urls import reverse
 
 
 class PostURLTests(TestCase):
@@ -54,7 +53,6 @@ class PostURLTests(TestCase):
     def test_urls_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
         templates = {
-            reverse('posts:index'): 'posts/index.html',
             f'/group/{self.group.slug}/': 'posts/group_list.html',
             f'/profile/{self.user.username}/': 'posts/profile.html',
             f'/posts/{self.post.id}/': 'posts/post_detail.html',
