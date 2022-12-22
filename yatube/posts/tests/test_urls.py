@@ -60,7 +60,7 @@ class PostURLTests(TestCase):
             '/create/': 'posts/create_post.html',
             f'/posts/{self.post.id}/edit/': 'posts/create_post.html'
         }
-        for address, template in templates_url_names.items():
+        for template, address  in templates_url_names.items():
             with self.subTest(adress=address):
                 response = self.authorized_client.get(address)
                 self.assertTemplateUsed(response, template)
