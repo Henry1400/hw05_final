@@ -52,7 +52,7 @@ class PostURLTests(TestCase):
 
     def test_urls_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
-        templates_url_names = {
+        templates = {
             '/': 'posts/index.html',
             f'/group/{self.group.slug}/': 'posts/group_list.html',
             f'/profile/{self.user.username}/': 'posts/profile.html',
@@ -60,11 +60,10 @@ class PostURLTests(TestCase):
             '/create/': 'posts/create_post.html',
             f'/posts/{self.post.id}/edit/': 'posts/create_post.html'
         }
-        for template, address in templates_url_names.items():
-            with self.subTest(adress=address):
-                response = self.authorized_client.get(address)
+        for template, adress in templates.items():
+            with self.subTest(adress=adress):
+                response = self.authorized_client.get(adress)
                 self.assertTemplateUsed(response, template)
-                self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_wrong_uri_returns_404(self):
         """Запрос к несуществующей странице вернёт ошибку 404."""
