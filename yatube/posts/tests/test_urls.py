@@ -53,22 +53,18 @@ class PostURLTests(TestCase):
 
     def test_urls_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
-        templates = {
+        templates_url_names = {
             reverse('posts:index'): 'posts/index.html',
-            reverse('posts:group_list', kwargs={'slug': self.group.slug}):
-                'posts/group_list.html',
-            reverse(
-                'posts:profile', kwargs={'username': self.user.username}):
-                    'posts/profile.html',
-            reverse('posts:post_detail', kwargs={'post_id': self.post.id}):
-                'posts/post_detail.html',
-            reverse('posts:create_post'): 'posts/create_post.html',
-            reverse('posts:post_edit', kwargs={'post_id': self.post.id}):
-                'posts/create_post.html'
+            reverse('posts:group_list', kwargs={'slug': 'test-slug'}):
+            'posts/group_list.html',
+            reverse('posts:profile', args={self.user}):
+            'posts/profile.html',
+            reverse('posts:post_detail', args={self.post.id}):
+            'posts/post_detail.html',
         }
-        for template, adress in templates.items():
+        for adress, template in templates_url_names.items():
             with self.subTest(adress=adress):
-                response = self.authorized_client.get(adress)
+                response = self.guest_client.get(adress)
                 self.assertTemplateUsed(response, template)
 
     def test_wrong_uri_returns_404(self):
