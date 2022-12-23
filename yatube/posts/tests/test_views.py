@@ -185,12 +185,20 @@ class PostPagesTests(TestCase):
 
     def test_cache(self):
         ''' Теста кэша.'''
+        post = Post.objects.create(
+            author=self.user,
+            text='Текстовый текст поста'
+        )
         response = self.guest_client.get(reverse('posts:index'))
         result = response.content
-        Post.objects.get(id=1).delete
+        post.delete()
         response2 = self.guest_client.get(reverse('posts:index'))
         result2 = response2.content
         self.assertEqual(result, result2)
+        cache.clear()
+        response3 = self.guest_client.get(reverse('posts:index'))
+        result3 = response3.content
+        self.assertNotEqual(result3, result)
 
 
 class PaginatorViewsTest(TestCase):
@@ -254,11 +262,9 @@ class FollowTests(TestCase):
     def test_unfollow(self):
         """Авторизованный пользователь может отписываться
         от других пользователей."""
-        self.follower_client.get(
-            reverse(
-                'posts:profile_follow',
-                kwargs={'username': self.user_following}
-            )
+        Follow.objects.create(
+            user=self.user_follower,
+            author=self.user_following
         )
         follow_count = Follow.objects.count()
         self.follower_client.get(

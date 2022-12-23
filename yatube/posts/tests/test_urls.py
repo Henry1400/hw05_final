@@ -23,6 +23,11 @@ class PostURLTests(TestCase):
             f'/profile/{self.user.username}/',
             f'/posts/{self.post.id}/'
         }
+        self.pages1 = [
+            '/follow/',
+            f'/profile/{self.user.username}/follow/',
+            f'/profile/{self.user.username}/unfollow/',
+        ]
 
     def test_url_guest_client(self):
         """Доступ неавторизованного пользователя"""
@@ -71,3 +76,10 @@ class PostURLTests(TestCase):
         """Запрос к несуществующей странице вернёт ошибку 404."""
         response = self.client.get('/unexisting_page/')
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+
+    def test_follow_(self):
+        """Follow доступны только авторизированному пользователю."""
+        for page in self.pages1:
+            with self.subTest(page=page):
+                response = self.guest_client.get(page)
+                self.assertEqual(response.status_code, HTTPStatus.FOUND)

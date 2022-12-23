@@ -19,7 +19,7 @@ def index(request):
 
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
-    posts = group.posts.select_related('group')
+    posts = group.posts.select_related('group', 'author')
     page_obj = page_paginator(posts, request)
     context = {
         'group': group,
@@ -30,7 +30,7 @@ def group_posts(request, slug):
 
 def profile(request, username):
     author = get_object_or_404(User, username=username)
-    posts = author.posts.select_related('author')
+    posts = author.posts.select_related('author', 'group')
     page_obj = page_paginator(posts, request)
     following = request.user.is_authenticated and author.following.filter(
         user=request.user).exists()
@@ -45,7 +45,7 @@ def profile(request, username):
 def post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     form = CommentForm()
-    comments = post.comments.select_related('author').all()
+    comments = post.comments.all().select_related('author')
     context = {
         'post': post,
         'form': form,
@@ -102,7 +102,11 @@ def add_comment(request, post_id):
 
 @login_required
 def follow_index(request):
-    posts = Post.objects.filter(author__following__user=request.user)
+    posts = (
+        Post.objects
+        .select_related('author')
+        .filter(author__following__user=request.user)
+    )
     page_obj = page_paginator(posts, request)
     context = {
         'page_obj': page_obj,
